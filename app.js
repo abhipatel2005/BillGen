@@ -29,6 +29,7 @@ function generateBill() {
     // Increment and display the bill count
     incrementBillCount();
     document.getElementById('bill-count').textContent = 'Bills Generated: ' + getBillCount();
+    document.getElementById('selected-count').textContent = checkboxes.length;
 }
 
 function generateNewBill() {
@@ -44,11 +45,6 @@ function incrementBillCount() {
     count++;
     localStorage.setItem('billCount', count);
 }
-//total income 
-
-// totalIncome += finalTotal;
-// localStorage.setItem('totalIncome', totalIncome.toFixed(2));
 
 // Display the initial bill count
 document.getElementById('bill-count').textContent = 'Bills Generated: ' + getBillCount();
-// document.getElementById('total-amount').textContent = 'Total Amount: ₹ ' + totalIncome.toFixed(2);

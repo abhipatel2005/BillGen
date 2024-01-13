@@ -80,6 +80,10 @@
             padding: 5px 10px;
             border-radius: 5px;
         }
+
+        .selected-items {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -90,37 +94,46 @@
     <table>
         <thead>
             <tr>
-                <th>Item</th>
-                <th>Price (per kg)</th>
-                <th>Price (per half kg)</th>
-                <th>Price (per 250 gm)</th>
+                <th data-column="Item">Item</th>
+                <th data-column="Price (per kg)">Price (per kg)</th>
+                <th data-column="Price (per half kg)">Price (per half kg)</th>
+                <th data-column="Price (per 250 gm)">Price (per 250 gm)</th>
                 <th>Total</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Item 1</td>
-                <td><input type="checkbox" class="price-checkbox" value="10"> per kg</td>
-                <td><input type="checkbox" class="price-checkbox" value="5"> per half kg</td>
-                <td><input type="checkbox" class="price-checkbox" value="2.5"> per 250 gm</td>
+                <td><input type="checkbox" class="price-checkbox" value="10" data-column="Price (per kg)"> per kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="5" data-column="Price (per half kg)"> per half kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="2.5" data-column="Price (per 250 gm)"> per 250 gm</td>
                 <td class="item-total">$0</td>
             </tr>
             <tr>
                 <td>Item 2</td>
-                <td><input type="checkbox" class="price-checkbox" value="15"> per kg</td>
-                <td><input type="checkbox" class="price-checkbox" value="7.5"> per half kg</td>
-                <td><input type="checkbox" class="price-checkbox" value="3.75"> per 250 gm</td>
+                <td><input type="checkbox" class="price-checkbox" value="15" data-column="Price (per kg)"> per kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="7.5" data-column="Price (per half kg)"> per half kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="3.75" data-column="Price (per 250 gm)"> per 250 gm</td>
                 <td class="item-total">$0</td>
             </tr>
             <tr>
                 <td colspan="4">Total</td>
                 <td id="final-total">$0</td>
             </tr>
+            <tr id="selected-count-row">
+                <td colspan="4">Total Selected</td>
+                <td id="selected-count">0</td>
+            </tr>
         </tbody>
     </table>
 
     <a href="#" class="checkout-btn" onclick="generateBill()">Generate Bill</a>
     <a href="#" class="generate-btn" onclick="generateNewBill()">Generate New Bill</a>
+
+    <div class="selected-items">
+        <h3>Selected Items</h3>
+        <ul id="selected-items-list"></ul>
+    </div>
 </div>
 
 <div class="bill-count" id="bill-count"></div>
@@ -140,8 +153,19 @@
         let rows = document.querySelectorAll('tbody tr');
         let finalTotal = 0;
 
+        // Clear the selected items list
+        document.getElementById('selected-items-list').innerHTML = '';
+
+        checkboxes.forEach(checkbox => {
+            let itemName = checkbox.parentElement.parentElement.firstElementChild.textContent;
+            let columnNames = Array.from(checkbox.attributes).filter(attr => attr.name.startsWith('data-column')).map(attr => attr.value);
+            let listItem = document.createElement('li');
+            listItem.textContent = `${itemName} (${columnNames.join(', ')})`;
+            document.getElementById('selected-items-list').appendChild(listItem);
+        });
+
         rows.forEach((row, index) => {
-            if (index < rows.length - 1) {
+            if (index < rows.length - 2) {
                 let prices = row.querySelectorAll('.price-checkbox:checked');
                 let totalPrice = 0;
 
@@ -164,6 +188,10 @@
         localStorage.setItem('totalIncome', totalIncome.toFixed(2));
 
         document.getElementById('bill-count').textContent = 'Bills Generated: ' + getBillCount();
+        document.getElementById('total-amount').textContent = 'Total Amount: $' + totalIncome.toFixed(2);
+
+        // Display the total number of selected checkboxes
+        document.getElementById('selected-count').textContent = checkboxes.length;
         document.getElementById('total-amount').textContent = 'Total Amount: $' + totalIncome.toFixed(2);
     }
 
