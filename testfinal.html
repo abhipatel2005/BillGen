@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .checkout-btn {
+            display: block;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .generate-btn {
+            display: block;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .bill-count {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .total-amount {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Shopping Cart</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Price (per kg)</th>
+                <th>Price (per half kg)</th>
+                <th>Price (per 250 gm)</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Item 1</td>
+                <td><input type="checkbox" class="price-checkbox" value="10"> per kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="5"> per half kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="2.5"> per 250 gm</td>
+                <td class="item-total">$0</td>
+            </tr>
+            <tr>
+                <td>Item 2</td>
+                <td><input type="checkbox" class="price-checkbox" value="15"> per kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="7.5"> per half kg</td>
+                <td><input type="checkbox" class="price-checkbox" value="3.75"> per 250 gm</td>
+                <td class="item-total">$0</td>
+            </tr>
+            <tr>
+                <td colspan="4">Total</td>
+                <td id="final-total">$0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="#" class="checkout-btn" onclick="generateBill()">Generate Bill</a>
+    <a href="#" class="generate-btn" onclick="generateNewBill()">Generate New Bill</a>
+</div>
+
+<div class="bill-count" id="bill-count"></div>
+<div class="total-amount" id="total-amount"></div>
+
+<script>
+    let totalIncome = parseFloat(localStorage.getItem('totalIncome')) || 0;
+
+    function generateBill() {
+        let checkboxes = document.querySelectorAll('.price-checkbox:checked');
+
+        if (checkboxes.length === 0) {
+            alert('Please select at least one option before generating the bill.');
+            return;
+        }
+
+        let rows = document.querySelectorAll('tbody tr');
+        let finalTotal = 0;
+
+        rows.forEach((row, index) => {
+            if (index < rows.length - 1) {
+                let prices = row.querySelectorAll('.price-checkbox:checked');
+                let totalPrice = 0;
+
+                prices.forEach(priceCheckbox => {
+                    totalPrice += parseFloat(priceCheckbox.value);
+                });
+
+                row.querySelector('.item-total').textContent = '$' + totalPrice.toFixed(2);
+                finalTotal += totalPrice;
+            }
+        });
+
+        document.getElementById('final-total').textContent = '$' + finalTotal.toFixed(2);
+        
+        // Increment and display the bill count
+        incrementBillCount();
+
+        // Update total income
+        totalIncome += finalTotal;
+        localStorage.setItem('totalIncome', totalIncome.toFixed(2));
+
+        document.getElementById('bill-count').textContent = 'Bills Generated: ' + getBillCount();
+        document.getElementById('total-amount').textContent = 'Total Amount: $' + totalIncome.toFixed(2);
+    }
+
+    function generateNewBill() {
+        location.reload();
+    }
+
+    function getBillCount() {
+        return localStorage.getItem('billCount') || 0;
+    }
+
+    function incrementBillCount() {
+        let count = getBillCount();
+        count++;
+        localStorage.setItem('billCount', count);
+    }
+
+    // Display the initial bill count and total income
+    document.getElementById('bill-count').textContent = 'Bills Generated: ' + getBillCount();
+    document.getElementById('total-amount').textContent = 'Total Amount: $' + totalIncome.toFixed(2);
+</script>
+
+</body>
+</html>
